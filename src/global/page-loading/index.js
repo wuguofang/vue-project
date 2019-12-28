@@ -31,9 +31,6 @@ const errorTimer = setTimeout(() => {
 Vue.mixin({
   updated: function () {
     this.$bus.$emit('ready')
-  },
-  created: function () {
-    this.$bus.$emit('ready')
   }
 })
 

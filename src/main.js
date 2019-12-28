@@ -3,7 +3,11 @@
 import Vue from 'vue'
 import App from './App'
 import router from './router'
+import { ToastPlugin, ConfirmPlugin, LoadingPlugin } from 'vux'
 import './global'
+Vue.use(ToastPlugin)
+Vue.use(ConfirmPlugin)
+Vue.use(LoadingPlugin)
 
 Vue.config.productionTip = false
 
