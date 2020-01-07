@@ -1,34 +1,40 @@
 <template>
   <div class="mall-wrap">
     <i-header :option="option"></i-header>
-    <div class="content-wrap">
-      <pannel-title text="积分商城" />
+    <div class="content-wrap" ref="list">
+      <pannel-title text="积分商城"/>
       <ul class="tab-list">
         <li>
           <img src="./images/credit.png" />
           <div class="desc">
             当前积分
-            <em>2400</em>
+            <em>{{credit}}</em>
           </div>
         </li>
-        <li>
+        <li @click="goList">
           <img src="./images/record.png" />
           <div class="desc">兑换记录</div>
         </li>
       </ul>
       <div class="credit-list">
         <div class="credit-item" v-for="(item, index) in prodList" :key="index">
-          <img :src="item.img" />
+          <img :src="item.image" />
           <div class="prod-detail">
             <p class="prod-desc">
-              {{item.desc}}
+              {{item.name}}
             </p>
             <span class="credit-label">
               所需积分
             </span>
-            <em class="credit-mount">{{item.amount}}</em>
-            <a class="exchange-btn">兑换</a>
+            <em class="credit-mount">{{item.scorePrice}}</em>
+            <a class="exchange-btn" @click="exchange(item)">兑换</a>
           </div>
+        </div>
+        <div class="no-data" v-if="prodList.length">
+          没有更多了～
+        </div>
+        <div class="no-data" v-if="!prodList.length">
+          暂无兑换商品～
         </div>
       </div>
     </div>
@@ -49,38 +55,12 @@ export default {
         showLogo: true,
         style: 'orange'
       },
-      prodList: [
-        {
-          url: 'javascript:',
-          img: 'https://ww1.sinaimg.cn/large/663d3650gy1fq66vw1k2wj20p00goq7n.jpg',
-          desc: '【圣诞礼物】MAC/魅可尤雾弹唇膏哑光口红316/923桃新款',
-          amount: 10000
-        },
-        {
-          url: 'javascript:',
-          img: 'https://ww1.sinaimg.cn/large/663d3650gy1fq66vw1k2wj20p00goq7n.jpg',
-          desc: '【圣诞礼物】MAC/魅可尤雾弹唇膏哑光口红316/923桃新款',
-          amount: 10000
-        },
-        {
-          url: 'javascript:',
-          img: 'https://ww1.sinaimg.cn/large/663d3650gy1fq66vw1k2wj20p00goq7n.jpg',
-          desc: '【圣诞礼物】MAC/魅可尤雾弹唇膏哑光口红316/923桃新款',
-          amount: 10000
-        },
-        {
-          url: 'javascript:',
-          img: 'https://ww1.sinaimg.cn/large/663d3650gy1fq66vw1k2wj20p00goq7n.jpg',
-          desc: '【圣诞礼物】MAC/魅可尤雾弹唇膏哑光口红316/923桃新款',
-          amount: 10000
-        },
-        {
-          url: 'javascript:',
-          img: 'https://ww1.sinaimg.cn/large/663d3650gy1fq66vw1k2wj20p00goq7n.jpg',
-          desc: '【圣诞礼物】MAC/魅可尤雾弹唇膏哑光口红316/923桃新款',
-          amount: 10000
-        }
-      ]
+      total: 2,
+      page: 1,
+      loadingText: '加载中...',
+      loading: false, // 是否展示下拉列表加载中
+      credit: 0, // 用户当前积分
+      prodList: []
     }
   },
   components: {
@@ -89,9 +69,86 @@ export default {
     PannelTitle
   },
   methods: {
+    // 监听scroll 触底加载
+    addScroll () {
+      window.addEventListener('scroll', this.scrollFn)
+    },
+    // 滚动事件
+    scrollFn () {
+      let heightWindow = document.documentElement.clientHeight || 
+        document.body.clientHeight
+      let list = this.$refs.list.getBoundingClientRect()
+      if(-list.top + heightWindow + 100 >= list.height) {
+        this.loading = true
+        if(this.page >= this.total) {
+          this.loadingText = '没有更多了'
+        }else {
+          this.page ++
+          this.loadingText = '加载中...'
+          this.queryList()
+        }
+      }
+    },
+    // 请求剩余积分
+    queryCredit () {
+      this.$ajax({
+        url : '/score/getBalance',
+        method: 'get',
+        directAjax: true,
+        params: {
+        }
+      }).then(res => {
+        this.$judgeLogin(res)
+        if(res.success && res.data) {
+          this.credit = res.data.target
+        }
+      })
+    },
+    // 请求商品列表
+    queryList () {
+      this.$ajax({
+        url : '/commodity/getCommondities',
+        method: 'post',
+        directAjax: true,
+        data: {
+          page: this.page,
+          size: 5
+        }
+      }).then(res => {
+        this.$judgeLogin(res)
+        if(res.success && res.data && res.data.target) {
+          this.total = res.data.target.totalPage
+          this.prodList = this.prodList.concat(res.data.target.result)
+        }
+        this.loading = false
+      })
+    },
+    // 兑换
+    exchange (item) {
+      let { id, name, image } = item
+      this.$router.push({
+        path: '/exchange', 
+        query: { 
+          id,
+          name,
+          image
+        }
+      })
+    },
+    // 兑换记录页面
+    goList () {
+      this.$router.push({
+        path: '/exchange-list'
+      })
+    }
   },
   mounted () {
-    this.$bus.$emit('ready')
+    this.queryCredit()
+    this.queryList()
+    this.addScroll()
+  },
+  destroyed() {
+    window.removeEventListener('scroll', this.scrollFn)
   }
 }
 </script>
@@ -156,17 +213,24 @@ export default {
       padding: 24px;
       margin-bottom: 24px;
       overflow: hidden;
+      display: flex;
       img {
         width: 192px;
         height: 192px;
-        float: left;
         margin-right: 32px;
       }
       .prod-detail {
         color: #4A4A4A;
+        height: 192px;
+        flex: 1;
         .prod-desc {
           font-size: 28px;
           font-weight: bold;
+          height: 80px;
+          display: -webkit-box;
+          -webkit-box-orient: vertical;
+          -webkit-line-clamp: 2;
+          overflow: hidden;
         }
         .credit-label {
           font-size: 24px;
@@ -190,6 +254,11 @@ export default {
           background-image: linear-gradient(-135deg, #FF9D20 0%, #FF5000 100%);
         }
       }
+    }
+    .loading {
+      text-align: center;
+      color: #999;
+      padding: 8px 0;
     }
   }
 }

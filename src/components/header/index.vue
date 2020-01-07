@@ -54,9 +54,9 @@ export default {
     bottom: 16px;
   }
   .vux-header {
+    height: 102px;
     background-color: transparent;
     font-size: 36px;
-    padding: 10px 0;
     .vux-header-left .left-arrow:before {
       border-color: #fff;
       border-width: 2PX 0 0 2PX;

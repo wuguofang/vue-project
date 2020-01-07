@@ -31,7 +31,7 @@ const devWebpackConfig = merge(baseWebpackConfig, {
     hot: true,
     contentBase: false, // since we use CopyWebpackPlugin.
     compress: true,
-    host: HOST || config.dev.host,
+    host: HOST || '0.0.0.0',
     port: PORT || config.dev.port,
     open: config.dev.autoOpenBrowser,
     overlay: config.dev.errorOverlay
@@ -88,6 +88,17 @@ module.exports = new Promise((resolve, reject) => {
         ? utils.createNotifierCallback()
         : undefined
       }))
+
+      // proxy
+      devWebpackConfig.devServer.proxy = {
+        '/api': {
+          target: "http://47.108.86.2",
+          changeOrigin: true,
+          // pathRewrite: {
+          //   '^/api': ''
+          // }
+        }
+      }
 
       resolve(devWebpackConfig)
     }

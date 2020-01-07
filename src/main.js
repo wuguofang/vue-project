@@ -11,6 +11,19 @@ Vue.use(LoadingPlugin)
 
 Vue.config.productionTip = false
 
+Vue.prototype.$judgeLogin = function (res) {
+  // 未登录 or 登录失效
+  if(res.needLogin) {
+    this.$vux.toast.show({
+      type: 'text',
+      text: res.errorMsg,
+      width: '5rem'
+    })
+    // 跳转登录地址
+    this.$router.push({path: '/login'})
+  }
+}
+
 /* eslint-disable no-new */
 new Vue({
   el: '#app',

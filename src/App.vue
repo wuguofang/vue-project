@@ -15,6 +15,9 @@ export default {
   },
   mounted () {
     this.updateClass();
+    document.addEventListener('gesturestart', (event) => {
+      event.preventDefault();
+    });
   },
   updated () {
     this.updateClass();
@@ -51,8 +54,13 @@ export default {
     z-index: 11;
   }
   .content-wrap {
-    margin: 0 30px 130px 30px;
-    padding-top: 120px;
+    margin: 0 30px;
+    padding: 120px 0 130px;
+  }
+  .no-data {
+    padding: 24px;
+    text-align: center;
+    color: #999;
   }
 }
 </style>

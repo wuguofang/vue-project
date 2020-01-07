@@ -8,7 +8,6 @@
             title="手机号" 
             v-model="mobile" 
             readonly
-            disabled
             @click="changeMobile"
             placeholder="请输入手机号"
           ></x-input>
@@ -19,12 +18,12 @@
             placeholder="请输入真实姓名"
           ></x-input>
 
-          <!-- <selector
+          <selector
             title="性别" 
             v-model="sex"
             placeholder="请选择性别"
             :options="ddmap.sex">
-          </selector> -->
+          </selector>
 
           <x-input 
             title="身份证号" 
@@ -33,38 +32,32 @@
             placeholder="请输入身份证号"
           ></x-input>
 
-          <!-- <x-input 
+          <x-input 
             title="住址" 
             v-model="address" 
             type="text" 
             placeholder="请输入详细地址"
-          ></x-input> -->
+          ></x-input>
 
-          <!-- <selector
+          <selector
             title="婚姻状况" 
             v-model="married"
             placeholder="请选择婚姻状况"
             :options="ddmap.maritalStatus">
-          </selector> -->
+          </selector>
 
-          <!-- <selector
+          <selector
             title="学历" 
             v-model="education"
             placeholder="请选择学历"
             :options="ddmap.diploma">
-          </selector> -->
+          </selector>
 
           <x-input 
             title="密码" 
             v-model="loginPass" 
             type="password" 
-            placeholder="密码必须为字母和数字的组合"
-          ></x-input>
-          <x-input 
-            title="确认密码" 
-            v-model="loginPassAgain" 
-            type="password" 
-            placeholder="请再次输入密码"
+            placeholder="请输入密码"
           ></x-input>
 
         </group>
@@ -86,9 +79,60 @@ import IBottom from 'components/bottom-title/index.vue'
 import MsgCode from 'components/msg-code/index.vue'
 import { JSEncrypt } from 'jsencrypt'
 import { Group, XInput, XButton, Selector } from 'vux'
-import { mobileReg, certNumberReg, pswReg } from 'util/reg'
+import { mobileReg, certNumberReg } from 'util/reg'
 import ddmap from 'util/ddmap'
 const encryptor = new JSEncrypt()
+const rules = {
+  mobile: (val) => {
+    return {
+      result: mobileReg.test(val),
+      errTips: !val ? '手机号不能为空' : '手机号格式有误'
+    }
+  },
+  certName: (val) => {
+    return {
+      result: !!val,
+      errTips: '真实姓名不能为空'
+    }
+  },
+  sex: (val) => {
+    console.log(val)
+    return {
+      result: !!val,
+      errTips: '性别不能为空'
+    }
+  },
+  certNumber: (val) => {
+    return {
+      result: certNumberReg.test(val),
+      errTips: !val ? '身份证不能为空' : '身份证格式有误'
+    }
+  },
+  address: (val) => {
+    return {
+      result: !!val,
+      errTips: '住址不能为空'
+    }
+  },
+  married: (val) => {
+    return {
+      result: !!val,
+      errTips: '婚姻状态不能为空'
+    }
+  },
+  education: (val) => {
+    return {
+      result: !!val,
+      errTips: '学历不能为空'
+    }
+  },
+  loginPass: (val) => {
+    return {
+      result: !!val,
+      errTips: '登录密码不能为空'
+    }
+  },
+}
 export default {
   name: 'Register',
   data () {
@@ -99,7 +143,6 @@ export default {
       address: '',
       married: '',
       loginPass: '',
-      loginPassAgain: '',
       education: '',
       sex: '',
       option: {
@@ -146,7 +189,7 @@ export default {
       if(!this.validate()) return
       this.getPublicKey(() => {
         this.$ajax({
-          url : '/customer/regist',
+          url : '/person/regist',
           method: 'post',
           data: {
             certType: "ID",
@@ -156,11 +199,11 @@ export default {
             certName: this.certName,
             mobile: this.mobile,
             certNumber: this.certNumber,
-            // address: this.address,
-            // married: this.married,
+            address: this.address,
+            married: this.married,
             loginPass: encryptor.encrypt(this.loginPass),
-            // education: this.education,
-            // sex: this.sex
+            education: this.education,
+            sex: this.sex
           },
           directAjax: true
         }).then(res => {
@@ -181,64 +224,7 @@ export default {
       this.$vux.toast.text('若需修改手机号，请返回上一步');
     },
     // 校验字段
-    validate () {
-      const rules = {
-        mobile: (val) => {
-          return {
-            result: mobileReg.test(val),
-            errTips: !val ? '手机号不能为空' : '手机号格式有误'
-          }
-        },
-        certName: (val) => {
-          return {
-            result: !!val,
-            errTips: '真实姓名不能为空'
-          }
-        },
-        // sex: (val) => {
-        //   console.log(val)
-        //   return {
-        //     result: !!val,
-        //     errTips: '性别不能为空'
-        //   }
-        // },
-        certNumber: (val) => {
-          return {
-            result: certNumberReg.test(val),
-            errTips: !val ? '身份证不能为空' : '身份证格式有误'
-          }
-        },
-        // address: (val) => {
-        //   return {
-        //     result: !!val,
-        //     errTips: '住址不能为空'
-        //   }
-        // },
-        // married: (val) => {
-        //   return {
-        //     result: !!val,
-        //     errTips: '婚姻状态不能为空'
-        //   }
-        // },
-        // education: (val) => {
-        //   return {
-        //     result: !!val,
-        //     errTips: '学历不能为空'
-        //   }
-        // },
-        loginPass: (val) => {
-          return {
-            result: pswReg.test(val),
-            errTips: '登录密码必须为字母和数字的组合'
-          }
-        },
-        loginPassAgain : (val) => {
-          return {
-            result: val == this.loginPass,
-            errTips: '两次密码输入不一致'
-          }
-        },
-      }
+    validate (showTip) {
       for(var key in rules) {
         var valid = rules[key];
         var r = valid(this[key]);

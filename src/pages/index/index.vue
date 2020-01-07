@@ -7,36 +7,54 @@
         <border-title text="产品介绍">
           <img class="more-prod" src="./images/more.png" @click="goMore" />
         </border-title>
-        <div class="product" v-for="(item, index) in productList" :key="index" @click="productClick(item.url)">
+        <div class="product"
+          v-if="productList.length" 
+          v-for="(item, index) in productList" 
+          :key="index" 
+          @click="productClick(item.id , item.name)"
+        >
           <div class="product-detail">
-            <img class="product-pic" :src="item.img" />
+            <img class="product-pic" :src="item.image" />
             <div class="product-desc">
               <p class="line-one">
                 <span class="left">
                   {{item.name}}
                 </span>
                 <span class="right">
-                  {{item.info1}}
+                  {{item.type}}
                 </span>
               </p>
               <p class="line-two">
                 <span class="left">
-                  <em>{{item.amount}}</em>万
+                  <em>{{transWan(item.productLimit)}}</em>万
                 </span>
                 <span class="right">
-                  {{item.info2}}
+                  {{item.repayType}}
                 </span>
               </p>
               <p class="line-three">
                 <span class="left">
-                  {{item.info3}}
+                  最高可贷
+                </span>
+                <span class="middle">
+                  {{item.synopsis}}
                 </span>
                 <span class="right">
-                  {{item.info4}}
+                  <img src="./images/fire.png" />
+                  <img src="./images/fire.png" />
+                  <img src="./images/fire.png" />
+                  <img src="./images/fire.png" />
+                  <img src="./images/fire.png" />
                 </span>
               </p>
             </div>
           </div>
+        </div>
+        <div class="no-data" v-if="productList.length">
+          没有更多了～
+        </div>
+        <div class="no-data" v-if="!productList.length">
+          暂无产品～
         </div>
       </div>
     </div>
@@ -49,6 +67,7 @@ import { Swiper } from 'vux'
 import IHeader from 'components/header/index.vue'
 import ITab from 'components/tab/index.vue'
 import BorderTitle from 'components/border-title/index.vue'
+import { moneyTransform } from 'util/data'
 export default {
   name: 'Index',
   data () {
@@ -66,56 +85,6 @@ export default {
         }
       ],
       productList: [
-        {
-          url: 'javascript:',
-          img: 'https://ww1.sinaimg.cn/large/663d3650gy1fq66vw1k2wj20p00goq7n.jpg',
-          name: '茂业贷',
-          amount: 10000,
-          info1: '房屋抵押',
-          info2: '先息后本',
-          info3: '最高可贷',
-          info4: '无分销佣金'
-        },
-        {
-          url: 'javascript:',
-          img: 'https://ww1.sinaimg.cn/large/663d3650gy1fq66vw1k2wj20p00goq7n.jpg',
-          name: '茂业贷',
-          amount: 10000,
-          info1: '房屋抵押',
-          info2: '先息后本',
-          info3: '最高可贷',
-          info4: '无分销佣金'
-        },
-        {
-          url: 'javascript:',
-          img: 'https://ww1.sinaimg.cn/large/663d3650gy1fq66vw1k2wj20p00goq7n.jpg',
-          name: '茂业贷',
-          amount: 10000,
-          info1: '房屋抵押',
-          info2: '先息后本',
-          info3: '最高可贷',
-          info4: '无分销佣金'
-        },
-        {
-          url: 'javascript:',
-          img: 'https://ww1.sinaimg.cn/large/663d3650gy1fq66vw1k2wj20p00goq7n.jpg',
-          name: '茂业贷',
-          amount: 10000,
-          info1: '房屋抵押',
-          info2: '先息后本',
-          info3: '最高可贷',
-          info4: '无分销佣金'
-        },
-        {
-          url: 'javascript:',
-          img: 'https://ww1.sinaimg.cn/large/663d3650gy1fq66vw1k2wj20p00goq7n.jpg',
-          name: '茂业贷',
-          amount: 10000,
-          info1: '房屋抵押',
-          info2: '先息后本',
-          info3: '最高可贷',
-          info4: '无分销佣金'
-        }
       ]
     }
   },
@@ -125,13 +94,40 @@ export default {
     ITab,
     BorderTitle
   },
+  mounted () {
+    this.queryList()
+  },
   methods: {
     // 跳转更多产品
     goMore () {
       this.$router.push({path: '/product'})
     },
-    productClick (url) {
-      this.$router.push({path: url})
+    transWan (num) {
+      return moneyTransform(num, 'wan')
+    },
+    // 跳转产品详情
+    productClick (id, name) {
+      this.$router.push({path: '/product-detail', query: {
+        id,
+        name
+      }})
+    },
+    // 请求产品列表 首页仅展示五条
+    queryList () {
+      this.$ajax({
+        // 临时
+        url : '/loan/getProducts',
+        method: 'post',
+        data: {
+          page: 1,
+          size: 5
+        },
+        directAjax: true
+      }).then(res => {
+        if(res.success && res.data && res.data.target) {
+          this.productList = res.data.target.result
+        }
+      })
     }
   }
 }
@@ -194,7 +190,7 @@ export default {
           font-weight: bold;
         }
         .right {
-          padding: 3px 12px;
+          padding: 3px 0;
           color: #3D91ED;
           font-size: 24px;
           float: right;
@@ -221,7 +217,7 @@ export default {
           }
         }
         .right {
-          padding: 3px 12px;
+          padding: 3px 0;
           color: #FF9D20;;
           font-size: 24px;
           float: right;
@@ -238,8 +234,20 @@ export default {
         }
       }
       .line-three {
+        display: flex;
+        .left {
+          flex: 1;
+        }
+        .middle {
+          flex: 1;
+        }
         .right {
-          float: right;
+          flex: 1;
+          text-align: right;
+          img {
+            width: 21px;
+            height: 26px;
+          }
         }
       }
     }

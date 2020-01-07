@@ -9,10 +9,19 @@
 .weui-cells {
   box-shadow: 0 0 5PX 0 rgba(0,0,0,0.05);
   border-radius: 4PX;
+  line-height: initial!important;
   .weui-cell::before {
     left: 0;
   }
-  .vux-x-input {
+  .weui-input, .weui-select {
+    font-size: 32px;
+    height: initial!important;
+    vertical-align: middle;
+  }
+  .weui-input {
+    line-height: 40px;
+  }
+  .vux-x-input, .vux-cell-box, .vux-selector {
     .weui-label {
       color: #FF5000;
       font-size: 32px;
@@ -23,22 +32,29 @@
   }
 }
 
+.vux-cell-box {
+  .vux-popup-picker-placeholder {
+    color: #ccc;
+    font-size: 32px;
+  }
+}
+
+.vux-popup-dialog {
+  .vux-popup-header-right {
+    color: #FF5500;
+  }
+}
+
+.vux-x-dialog {
+  .weui-dialog__btn_primary {
+    color: #FF5500;
+  }
+  .weui-dialog__ft {
+    font-size: 32px;
+  }
+}
+
 input::-webkit-input-placeholder, textarea::-webkit-input-placeholder {
-  color: #666;
-  font-size: 32px;
-}
-
-input:-moz-placeholder, textarea:-moz-placeholder {
-  color: #666;
-  font-size: 32px;
-}
-
-input::-moz-placeholder, textarea::-moz-placeholder {
-  color: #666;
-  font-size: 32px;
-}
-
-input:-ms-input-placeholder, textarea:-ms-input-placeholder {
   color: #666;
   font-size: 32px;
 }
