@@ -46,7 +46,11 @@ export default {
     opType: '',
     mobileLabel: '',
     mobilePlaceholder: '',
-    clearMobile: false
+    clearMobile: false,
+    url: '', // 发送验证码请求url
+    paramsType: '', // 请求参数类型 body or querystring
+    params: {}, // 其他参数
+    phoneAttr: '', // 发送请求时手机号参数名
   },
   data () {
     return {
@@ -136,12 +140,13 @@ export default {
     // 发送验证码
     sendMsg () {
       this.$ajax({
-        url : '/validation/apply',
+        url : this.url || '/validation/apply',
         method: 'post',
-        params: {
-          userName: this.phone,
+        [this.paramsType || 'params']: {
+          [this.phoneAttr || 'userName']: this.phone,
           opType: this.opType,
-          type: 0
+          type: 0,
+          ...this.params
         },
         directAjax: true
       }).then(res => {

@@ -34,6 +34,8 @@ import Apply from '@/pages/apply'
 import Exchange from '@/pages/exchange'
 // 兑换记录页面
 import ExchangeList from '@/pages/exchange-list'
+// 积分明细页面
+import ScoreList from '@/pages/score-list'
 
 Vue.use(Router)
 
@@ -127,6 +129,11 @@ export default new Router({
       path: '/exchange-list',
       name: 'ExchangeList',
       component: ExchangeList
+    },
+    {
+      path: '/score-list',
+      name: 'ScoreList',
+      component: ScoreList
     }
   ]
 })

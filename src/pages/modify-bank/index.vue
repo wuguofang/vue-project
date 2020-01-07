@@ -10,12 +10,14 @@
             type="text" 
             placeholder="请输入银行卡号"
             @on-blur="change"
+            @on-change="commonChange"
           ></x-input>
           <x-input 
             title="开户名" 
             v-model="bankCardName" 
             type="text" 
             placeholder="请输入开户名"
+            @on-change="commonChange"
           ></x-input>
           <x-input
             v-if="bankName"
@@ -31,18 +33,31 @@
             placeholder="" 
             v-model="accountType" 
           ></x-input>
-          <x-input 
+          <!-- <x-input 
             title="手机号" 
             v-model="bankMobile" 
             type="text" 
             placeholder="请输入银行卡绑定的手机号"
-          ></x-input>
+          ></x-input> -->
           <x-input 
             title="身份证号" 
+            @on-change="commonChange"
             v-model="certNumber" 
             type="text" 
             placeholder="请输入身份证号"
           ></x-input>
+          <msg-code
+            v-if="canSend"
+            :msgCodeChange="msgCodeChange"
+            :clearMobile="true"
+            phoneAttr="bankMobile"
+            mobilePlaceholder="请输入银行卡绑定的手机号"
+            url="/bankcard/apply_sign"
+            :canSend="canSend"
+            :params="sendMsgParams"
+            paramsType="data"
+          >
+          </msg-code>
         </group>
         <x-button 
           class="submit-btn" 
@@ -57,6 +72,7 @@
 <script>
 import IHeader from 'components/header/index.vue'
 import { mobileReg, certNumberReg } from 'util/reg'
+import MsgCode from 'components/msg-code/index.vue'
 import { Group, XInput, XButton } from 'vux'
 import Qs from 'qs'
 const accountTypeMap = {
@@ -76,12 +92,12 @@ const rules = {
       errTips: '开户名不能为空'
     }
   },
-  bankMobile: (val) => {
-    return {
-      result: mobileReg.test(val),
-      errTips: !val ? '手机号不能为空' : '手机号格式有误'
-    }
-  },
+  // bankMobile: (val) => {
+  //   return {
+  //     result: mobileReg.test(val),
+  //     errTips: !val ? '手机号不能为空' : '手机号格式有误'
+  //   }
+  // },
   certNumber: (val) => {
     return {
       result: certNumberReg.test(val),
@@ -112,42 +128,40 @@ export default {
         style: 'orange',
         showBack: true
       },
-      flag: true, // 银行卡变化请求信息flag
+      canSend: false, // 是否能发送验证码
+      sendMsgParams: {}, // 验证码请求参数
+      validateCode: '',
+      cardId: '',
     }
   },
   components: {
     Group,
     XInput,
     XButton,
-    IHeader
+    IHeader,
+    MsgCode
   },
   methods: {
     // 提交
     submit () {
-      if(!this.validate()) return
       this.$ajax({
-        url : '/bankcard/apply_sign',
+        url : '/bankcard/confirm_sign',
         method: 'post',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8' 
+        },
+        transformRequest: [(data) => {
+          data = Qs.stringify(data)
+          return data
+        }],
         data: {
-          accountType: this.bankCardType,
-          // back: "string",
-          // bankBranch: "string",
-          bankCardName: this.bankCardName,
-          bankCardNumber: this.bankCardNumber,
-          bankCode: this.bankCode,
-          bankMobile: this.bankMobile,
-          bankName: this.bankName,
-          certNumber: this.certNumber,
-          certType: "ID",
-          deductChannel: 'ebay3024',
-          // positive: "string",
-          signChannel: 'ebay1024',
-          // unionCode: "string"
+          cardId: this.cardId,
+          validateCode: this.validateCode
         },
         directAjax: true
       }).then(res => {
         if(res.success) {
-          this.$vux.toast.text('修改成功', 'default')
+          this.$vux.toast.text('绑定成功', 'default')
           setTimeout(() => {
             // 修改成功 跳转至来源页面
             this.$router.go(-1)
@@ -160,6 +174,12 @@ export default {
     // 监听银行卡变化 
     change (val) {
       this.getBankInfo()
+    },
+    // 验证码变化
+    msgCodeChange (args) {
+      let { code, id } = args
+      this.validateCode = code
+      this.cardId = id
     },
     // 获取银行卡信息
     getBankInfo () {
@@ -185,7 +205,11 @@ export default {
           this.bankCode = bankCode
           this.bankName = bankName
         }else {
-          this.$vux.toast.text(res.errorMsg, 'default')
+          this.bankCode = ''
+          this.bankName = ''
+          this.bankCardType = ''
+          this.accountType = ''
+          this.$vux.toast.text('请检查银行卡号是否正确', 'default')
         }
       })
     },
@@ -195,12 +219,32 @@ export default {
         var valid = rules[key];
         var r = valid(this[key]);
         if(!r.result) {
-          this.$vux.toast.text(r.errTips);
           return false;
         }
       }
       return true;
     },
+    // 验证是否能发送验证码
+    commonChange () {
+      if(this.validate()) {
+        this.sendMsgParams = {
+          accountType: this.bankCardType,
+          // back: "string",
+          // bankBranch: "string",
+          bankCardName: this.bankCardName,
+          bankCardNumber: this.bankCardNumber,
+          bankCode: this.bankCode,
+          bankName: this.bankName,
+          certNumber: this.certNumber,
+          certType: "ID",
+          deductChannel: 'ebay3024',
+          // positive: "string",
+          signChannel: 'ebay1024',
+          // unionCode: "string"
+        }
+        this.canSend = true
+      }
+    }
   }
 }
 </script>

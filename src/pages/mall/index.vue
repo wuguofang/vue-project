@@ -6,7 +6,7 @@
       <ul class="tab-list">
         <li>
           <img src="./images/credit.png" />
-          <div class="desc">
+          <div class="desc" @click="goScore">
             当前积分
             <em>{{credit}}</em>
           </div>
@@ -139,6 +139,12 @@ export default {
     goList () {
       this.$router.push({
         path: '/exchange-list'
+      })
+    },
+    // 跳转积分明细页面
+    goScore () {
+      this.$router.push({
+        path: '/score-list'
       })
     }
   },
