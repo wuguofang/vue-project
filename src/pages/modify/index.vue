@@ -43,7 +43,7 @@ const INPUTMAP = {
     api: '/customer/update_email'
   },
   'address': {
-    label: '收货地址',
+    label: '通信地址',
     type: 'text',
     api: '/person/update'
   }

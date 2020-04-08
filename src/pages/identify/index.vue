@@ -70,7 +70,7 @@
                 :upload-url="uploadUrl"
                 name="img"
                 size="small"
-                :uploadSuccess="(val) => {this.uploadSuccess('bankPositive', val)}"
+                :uploadSuccess="(val) => {this.uploadSuccess('bankCardPositive', val)}"
               ></uploader>
             </div>
             <div class="upload-item">
@@ -87,7 +87,7 @@
                 :upload-url="uploadUrl"
                 name="img"
                 size="small"
-                :uploadSuccess="(val) => {this.uploadSuccess('bankBack', val)}"
+                :uploadSuccess="(val) => {this.uploadSuccess('bankCardBack', val)}"
               ></uploader>
             </div>
           </div>
@@ -109,6 +109,7 @@ import IHeader from 'components/header/index.vue'
 import { Group, XInput, XButton, Radio } from 'vux'
 import { mobileReg } from 'util/reg'
 import desensitization from 'util/desensitization'
+import Qs from 'qs'
 const rules = {
   // mobile: (val) => {
   //   return {
@@ -134,13 +135,13 @@ const rules = {
       errTips: '身份证背面不能为空'
     }
   },
-  bankPositive: (val) => {
+  bankCardPositive: (val) => {
     return {
       result: !!val,
       errTips: '银行卡正面不能为空'
     }
   },
-  bankBack: (val) => {
+  bankCardBack: (val) => {
     return {
       result: !!val,
       errTips: '银行卡背面不能为空'
@@ -158,8 +159,8 @@ export default {
       // mobile: '', // 手机
       certPositive: '', // 身份证正面
       certBack: '', // 身份证背面
-      bankPositive: '', // 银行卡正面
-      bankBack: '', // 银行卡背面
+      bankCardPositive: '', // 银行卡正面
+      bankCardBack: '', // 银行卡背面
       option: {
         text: '实名认证',
         style: 'orange',
@@ -187,13 +188,20 @@ export default {
       this.$ajax({
         url : '/person/update',
         method: 'post',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8' 
+        },
+        transformRequest: [(data) => {
+          data = Qs.stringify(data)
+          return data
+        }],
         data: {
           // userName: this.userName,
           // mobile: this.mobile,
           certPositive: this.certPositive[0],
           certBack: this.certBack[0],
-          bankPositive: this.bankPositive[0],
-          bankBack: this.bankBack[0],
+          bankCardPositive: this.bankCardPositive[0],
+          bankCardBack: this.bankCardBack[0],
         },
         directAjax: true
       }).then(res => {

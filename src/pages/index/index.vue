@@ -1,64 +1,10 @@
 <template>
   <div class="index-wrap">
-    <i-header :option="option"></i-header>
-    <div class="content-wrap">
-      <swiper :list="bannerList" dots-position="center"></swiper>
-      <div class="product-list">
-        <border-title text="产品介绍">
-          <img class="more-prod" src="./images/more.png" @click="goMore" />
-        </border-title>
-        <div class="product"
-          v-if="productList.length" 
-          v-for="(item, index) in productList" 
-          :key="index" 
-          @click="productClick(item.id , item.name)"
-        >
-          <div class="product-detail">
-            <img class="product-pic" :src="item.image" />
-            <div class="product-desc">
-              <p class="line-one">
-                <span class="left">
-                  {{item.name}}
-                </span>
-                <span class="right">
-                  {{item.type}}
-                </span>
-              </p>
-              <p class="line-two">
-                <span class="left">
-                  <em>{{transWan(item.productLimit)}}</em>万
-                </span>
-                <span class="right">
-                  {{item.repayType}}
-                </span>
-              </p>
-              <p class="line-three">
-                <span class="left">
-                  最高可贷
-                </span>
-                <span class="middle">
-                  {{item.synopsis}}
-                </span>
-                <span class="right">
-                  <img src="./images/fire.png" />
-                  <img src="./images/fire.png" />
-                  <img src="./images/fire.png" />
-                  <img src="./images/fire.png" />
-                  <img src="./images/fire.png" />
-                </span>
-              </p>
-            </div>
-          </div>
-        </div>
-        <div class="no-data" v-if="productList.length">
-          没有更多了～
-        </div>
-        <div class="no-data" v-if="!productList.length">
-          暂无产品～
-        </div>
-      </div>
-    </div>
-    <i-tab></i-tab>
+    <video id="example_video_1" class="video-js vjs-default-skin" controls preload="none" poster="http://vjs.zencdn.net/v/oceans.png">
+
+    <source src="http://127.0.0.1:7002/live/movie.m3u8" type="application/x-mpegURL">
+
+  </video>
   </div>
 </template>
 

@@ -23,6 +23,12 @@
             placeholder="密码必须为字母和数字的组合" 
             v-model="psw" 
           ></x-input>
+          <x-input 
+            title="确认密码" 
+            v-model="pswConfirm" 
+            type="password" 
+            placeholder="请再次输入密码"
+          ></x-input>
         </group>
         <x-button 
           class="submit-btn" 
@@ -53,20 +59,6 @@ const TypeMap = {
     clearMobile: true
   }
 }
-const rules = {
-  psw: (val) => {
-    return {
-      result: pswReg.test(val),
-      errTips: '登录密码必须为字母和数字的组合'
-    }
-  },
-  certNumber: (val) => {
-    return {
-      result: certNumberReg.test(val),
-      errTips: !val ? '身份证号不能为空' : '身份证号格式有误'
-    }
-  }
-}
 export default {
   name: 'Reset',
   data () {
@@ -74,6 +66,7 @@ export default {
       mobile: '', // 手机号
       code: '', // 验证码
       psw: '', // 密码
+      pswConfirm: '', // 确认密码
       certNumber: '', // 身份证号
       isSend: false, // 是否发送验证码
       allowLogin: false, // 是否允许登录
@@ -159,6 +152,26 @@ export default {
     },
     // 校验
     validate () {
+      const rules = {
+        psw: (val) => {
+          return {
+            result: pswReg.test(val),
+            errTips: '登录密码必须为字母和数字的组合'
+          }
+        },
+        pswConfirm: (val) => {
+          return {
+            result: val == this.psw,
+            errTips: '两次密码输入不一致'
+          }
+        },
+        certNumber: (val) => {
+          return {
+            result: certNumberReg.test(val),
+            errTips: !val ? '身份证号不能为空' : '身份证号格式有误'
+          }
+        }
+      }
       for(var key in rules) {
         var valid = rules[key];
         var r = valid(this[key]);

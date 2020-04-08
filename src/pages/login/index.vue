@@ -136,7 +136,7 @@ export default {
           }).then(res => {
             if(res.success && res.data) {
               // 登录成功 跳转至首页
-              Cookies.set('token', res.data.token, { expires: 1 })
+              Cookies.set('token', res.data.token, { expires: 7 })
               this.$router.push({path: '/index'})
             }else {
               // 判断是否超过三次

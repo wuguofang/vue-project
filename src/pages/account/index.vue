@@ -23,7 +23,8 @@
               <span class="detail-content">
                 <span>{{userInfo.mobile || '暂无'}}</span>
               </span>
-              <a class="go-arrow" @click="modifyMobile()">修改</a>
+              <!-- <a class="go-arrow" @click="modifyMobile()">修改</a> -->
+              <a class="go-arrow gray"></a>
             </div>
           </li>
           <li>
@@ -54,18 +55,19 @@
             </div>
           </li>
           <li>
-            <span class="detail-label">住址</span>
+            <span class="detail-label">通信地址</span>
             <div class="right-part">
               <span class="detail-content">
                 <span>
                   {{userInfo.address || '暂无'}}
                 </span>
               </span>
-              <a class="go-arrow" @click="modify({label: '收货地址', name: 'address'})">修改</a>
+              <!-- <a class="go-arrow" @click="modify({label: '收货地址', name: 'address'})">修改</a> -->
+              <a class="go-arrow gray"></a>
             </div>
           </li>
           <li>
-            <span class="detail-label">实名认证</span>
+            <span class="detail-label">实名信息</span>
             <div class="right-part">
               <span class="detail-content">
                 <span>
